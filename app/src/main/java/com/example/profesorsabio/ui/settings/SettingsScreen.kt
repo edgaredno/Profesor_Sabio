@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -15,10 +16,14 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
     onNavigateUp: () -> Unit
 ) {
-    var apiKey by remember { mutableStateOf(viewModel.getApiKey()) }
-    var model by remember { mutableStateOf(viewModel.getModel()) }
+    var apiKey by remember { mutableStateOf("") } // Inicialmente vacío para no mostrar la clave guardada
+    // Definir los modelos 2.5 disponibles
+    val available25Models = listOf("gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.5-turbo")
+    
+    // Obtener el modelo guardado, si no es un modelo 2.5 válido, establecer gemini-2.5-flash por defecto
+    var model by remember { mutableStateOf(viewModel.getModel().takeIf { it in available25Models } ?: "gemini-2.5-flash") }
+    
     var expanded by remember { mutableStateOf(false) }
-    val models = listOf("gemini-1.5-flash", "gemini-1.5-pro")
 
     Scaffold(
         topBar = {
@@ -43,6 +48,7 @@ fun SettingsScreen(
                 value = apiKey,
                 onValueChange = { apiKey = it },
                 label = { Text("Clave de API de Gemini") },
+                visualTransformation = PasswordVisualTransformation(), // Ocultar la clave
                 modifier = Modifier.fillMaxWidth()
             )
             ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
@@ -55,7 +61,7 @@ fun SettingsScreen(
                     modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    models.forEach { selectionOption ->
+                    available25Models.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(selectionOption) },
                             onClick = {
@@ -69,7 +75,10 @@ fun SettingsScreen(
             }
             Button(
                 onClick = {
-                    viewModel.saveApiKey(apiKey)
+                    // Solo guardar la clave si se ha introducido algo
+                    if (apiKey.isNotBlank()) {
+                        viewModel.saveApiKey(apiKey)
+                    }
                     viewModel.saveModel(model)
                     onNavigateUp()
                 },

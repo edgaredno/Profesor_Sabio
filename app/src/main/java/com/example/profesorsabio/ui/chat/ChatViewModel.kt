@@ -67,6 +67,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 val suggestionModel = getGenerativeModel("Genera 3 preguntas cortas que un niño de primaria podría hacer a continuación sobre el tema dado. Responde solo con las preguntas, cada una en una nueva línea, sin numeración ni guiones.")
+                if (suggestionModel == null) return@launch 
+
                 val topicContent = content { text(topic) }
                 val response = suggestionModel.generateContent(topicContent)
                 val suggestions = response.text?.split("\n")?.filter { it.isNotBlank() } ?: emptyList()
