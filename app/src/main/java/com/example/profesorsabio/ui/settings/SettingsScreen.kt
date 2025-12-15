@@ -39,14 +39,14 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            TextField(
+            OutlinedTextField(
                 value = apiKey,
                 onValueChange = { apiKey = it },
                 label = { Text("Clave de API de Gemini") },
                 modifier = Modifier.fillMaxWidth()
             )
             ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                TextField(
+                OutlinedTextField(
                     value = model,
                     onValueChange = {},
                     label = { Text("Modelo") },
@@ -61,7 +61,8 @@ fun SettingsScreen(
                             onClick = {
                                 model = selectionOption
                                 expanded = false
-                            }
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
                     }
                 }
